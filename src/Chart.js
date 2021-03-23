@@ -1,9 +1,10 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@material-ui/core/styles';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import Title from './Title';
 
-// Generate Sales Data
+const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 function createData(ts, pl_one_level, pl_two_level) {
   let date = getDayFromTimestamp(ts);
   let graph_data = {
@@ -18,23 +19,42 @@ function getDayFromTimestamp(unix_ts) {
   return new Date(unix_ts * 1000).getDate();
 }
 
-const data = [
-  createData(1612202226, 725, 800),
-  createData(1612288626, 650, 750),
-  createData(1612375026, 444, 689),
-  createData(1612461426, 300, 615),
-  createData(1612547826, undefined),
-];
-
 export default function Chart() {
   const theme = useTheme();
+  const [readings, setReadings] = useState([]);
+
+  useEffect(() => {
+    fetch(new URL(`${REACT_APP_API_BASE_URL}/readings`),
+      {
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+    .then(res => res.json())
+    .then(
+      (result) => {
+        const data = result.map(obj =>
+          createData(
+            obj['reported']['utc_timestamp'],
+            Number(obj['reported']['plant_one']),
+            Number(obj['reported']['plant_two'])
+          )
+        );
+        setReadings(data);
+      },
+      (error) => {
+        console.log(error);
+      }
+    )
+  }, []);
+
 
   return (
     <React.Fragment>
       <Title>Plant Moisture Dashboard</Title>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
-          data={data}
+          data={readings}
           margin={{
             top: 16,
             right: 16,
