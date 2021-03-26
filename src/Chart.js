@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@material-ui/core/styles';
-import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, Label, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Title from './Title';
 
 const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
@@ -52,32 +52,23 @@ export default function Chart() {
   return (
     <React.Fragment>
       <Title>Plant Moisture Dashboard</Title>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={readings}
           margin={{
             top: 16,
-            right: 16,
-            bottom: 0,
-            left: 24,
+            right: 30,
+            bottom: 20,
+            left: 30,
           }}
         >
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
             stroke={theme.palette.text.secondary}
             style={theme.typography.body2}
+            label={{ value: 'Day', position: 'insideBottomRight', offset: -10 }}
           >
-          <Label
-              position="center"
-              offset={10}
-              style={{
-                textAnchor: 'middle', // working here need to get the "Day" to be below the data
-                fill: theme.palette.text.primary,
-                ...theme.typography.body1,
-              }}
-            >
-              Day
-            </Label>
           </XAxis>
           <YAxis
             stroke={theme.palette.text.secondary}
@@ -95,6 +86,8 @@ export default function Chart() {
               Moisture (ADC)
             </Label>
           </YAxis>
+          <Tooltip />
+          <Legend />
           <Line
             isAnimationActive={false}
             type="monotone"
@@ -106,7 +99,7 @@ export default function Chart() {
             isAnimationActive={false}
             type="monotone"
             dataKey="plant_two"
-            stroke={theme.palette.primary.main}
+            stroke={theme.palette.primary.secondary}
             dot={false}
           />
         </LineChart>
