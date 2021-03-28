@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@material-ui/core/styles';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, Label, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, Label, CartesianGrid, ResponsiveContainer } from 'recharts';
 import Title from './Title';
 
 const REACT_APP_API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-function createData(ts, pl_one_level, pl_two_level) {
+function createData(ts, reading) {
   let date = getDayFromTimestamp(ts);
   let graph_data = {
     'date': date,
-    'plant_one': pl_two_level,
-    'plant_two': pl_one_level,
+    'plant': reading,
   };
   return graph_data;
 }
@@ -36,7 +35,6 @@ export default function Chart() {
         const data = result.map(obj =>
           createData(
             obj['reported']['utc_timestamp'],
-            Number(obj['reported']['plant_one']),
             Number(obj['reported']['plant_two'])
           )
         );
@@ -67,7 +65,7 @@ export default function Chart() {
             dataKey="date"
             stroke={theme.palette.text.secondary}
             style={theme.typography.body2}
-            label={{ value: 'Day', position: 'insideBottomRight', offset: -10 }}
+            label={{ value: 'Day', position: 'insideBottom', offset: -10 }}
           >
           </XAxis>
           <YAxis
@@ -87,18 +85,10 @@ export default function Chart() {
             </Label>
           </YAxis>
           <Tooltip />
-          <Legend />
           <Line
             isAnimationActive={false}
             type="monotone"
-            dataKey="plant_one"
-            stroke={theme.palette.primary.main}
-            dot={false}
-          />
-          <Line
-            isAnimationActive={false}
-            type="monotone"
-            dataKey="plant_two"
+            dataKey="plant"
             stroke={theme.palette.primary.secondary}
             dot={false}
           />
